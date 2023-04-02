@@ -168,16 +168,15 @@ bool integrantes_repetidos(vector<Mail> s) {
 // Ejercicio 11
 map<set<LU>, Mail> entregas_finales(vector<Mail> s) {
   map<set<LU>, Mail> res;
-  map<set<LU>, int> apariciones;
   for (Mail m: s){
       set<LU> conj_de_libretas = m.libretas();
-      if (apariciones[conj_de_libretas] == 1){
+      if (res.count(conj_de_libretas) == 1){
 
-      if ((res[conj_de_libretas].fecha() < m.fecha()) && m.adjunto() == true){
-          res[conj_de_libretas] = m;
-      }}
+          if ((res[conj_de_libretas].fecha() < m.fecha()) && m.adjunto()){
+              res[conj_de_libretas] = m;
+          }
+      }
       else {
-      apariciones[conj_de_libretas] = 1;
       res[conj_de_libretas] = m; }
       }
       return res;
