@@ -21,7 +21,17 @@ vector<int> quitar_repetidos(vector<int> s) {
 // Ejercicio 2
 
 vector<int> quitar_repetidos_v2(vector<int> s) {
-    return vector<int>();
+    set<int> conj;
+    vector<int> res;
+    for (int x: s) {
+        conj.insert(x);
+    }
+    for (int y: conj) {
+        res.push_back(y);
+    }
+
+
+    return res;
 
 }
 // Ejercicio 3
@@ -47,7 +57,21 @@ bool mismos_elementos(vector<int> a, vector<int> b) {
 // Ejercicio 4
 
 bool mismos_elementos_v2(vector<int> a, vector<int> b) {
-    return true;
+    set<int> ac;
+    set<int> bc;
+    for(int x: a) {
+        ac.insert(x);
+
+    }
+    for(int y: b) {
+        bc.insert(y);
+    }
+    if (bc == ac) {
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 
@@ -92,13 +116,13 @@ set<int> interseccion(set<int> a, set<int> b) {
 map<int, set<int>> agrupar_por_unidades(vector<int> s) {
     map<int,set<int>> dicc;
     for(int x: s) {
-        if (dicc[(x % 10)].size() > 1) {
-        dicc[(x%10)] = dicc[(x % 10)].insert(x) ;
+        if (dicc[(x % 10)].size() >= 1) {
+        dicc[(x % 10)].insert(x) ;
 
 
         }
         else {
-            dicc[ x % 10] = 1;
+            dicc[(x % 10)] = {x};
         }
     }
     return dicc;
@@ -106,15 +130,56 @@ map<int, set<int>> agrupar_por_unidades(vector<int> s) {
 
 // Ejercicio 9
 vector<char> traducir(vector<pair<char, char>> tr, vector<char> str) {
-    return vector<char>();
+    map<char,char> dicc;
+    for(pair<char,char> p: tr) {
+        dicc[p.first] = p.second;
+    }
+    vector<char> res;
+    for(char c: str) {
+     if (dicc.count(c) >= 1) {
+         res.push_back(dicc[c]) ;
+     }
+     else {
+         res.push_back(c);
+     }
+    }
+    return res ;
 }
 
 // Ejercicio 10
 bool integrantes_repetidos(vector<Mail> s) {
-    return true;
+    map<LU, int> dicc;
+    for (Mail m: s){
+        set<LU> conj_de_libretas = m.libretas();
+        for (LU j: conj_de_libretas){
+            if (dicc[j] == 1) {
+                return true;
+            }
+            else {
+                dicc[j] = 1;
+            }
+
+        }
+
+    }
+    return false;
 }
 
 // Ejercicio 11
 map<set<LU>, Mail> entregas_finales(vector<Mail> s) {
-  return map<set<LU>, Mail>();
-}
+  map<set<LU>, Mail> res;
+  map<set<LU>, int> apariciones;
+  for (Mail m: s){
+      set<LU> conj_de_libretas = m.libretas();
+      if (apariciones[conj_de_libretas] == 1){
+
+      if ((res[conj_de_libretas].fecha() < m.fecha()) && m.adjunto() == true){
+          res[conj_de_libretas] = m;
+      }}
+      else {
+      apariciones[conj_de_libretas] = 1;
+      res[conj_de_libretas] = m; }
+      }
+      return res;
+  }
+
