@@ -79,7 +79,7 @@ bool mismos_elementos_v2(vector<int> a, vector<int> b) {
 map<int, int> contar_apariciones(vector<int> s) {
     map<int,int> dicc;
     for(int n: s){
-        if (dicc[n] == 1) {
+        if (dicc[n] >= 1) {
             dicc[n] = dicc[n] + 1;
         }
         else {
