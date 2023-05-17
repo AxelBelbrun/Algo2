@@ -8,7 +8,8 @@ string_map<T>::string_map(const string_map<T>& aCopiar) : string_map() { *this =
 
 template <typename T>
 string_map<T>& string_map<T>::operator=(const string_map<T>& d) {
-
+    this-> = string_map<T>(d);
+    return this;
 }
 
 template <typename T>
@@ -98,6 +99,7 @@ void string_map<T>::erase(const string& clave) {
     Nodo* actual = raiz;
     Nodo* anterior = raiz;
     Nodo* ultimoNoBorrable = raiz;
+    int indice = 0;
     for(char elem: clave){
         if ((actual->esNodoEliminable()) && (actual != raiz)){
             actual = actual->siguientes[int(elem)];
@@ -107,12 +109,28 @@ void string_map<T>::erase(const string& clave) {
             actual = actual->siguientes[int(elem)];
             anterior = actual;
             ultimoNoBorrable = actual;
+            indice++;
+
         }
     }
     actual->definicion = nullptr;
     if (actual->esNodoFinalEliminable()){
         delete actual;
     }
+    int i = 0;
+    actual = raiz;
+    for(char elem: clave){
+        if(i<=indice){
+            actual = actual->siguientes[int(elem)];
+
+        }
+        else{
+        Nodo* temp = actual->siguientes[int(elem)];
+        delete actual;
+        actual = temp;
+        }
+    }
+
     _size--;
 }
 
