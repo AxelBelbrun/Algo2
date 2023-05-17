@@ -85,13 +85,36 @@ private:
         T* definicion;
         Nodo() :  definicion(nullptr) {
 
-        vector<Nodo*> vect(120, nullptr);
-        siguientes = vect;
+        vector<Nodo*> vect(256, nullptr);
+        siguientes = vect;}
+        bool esNodoEliminable() {
+            if(this->definicion != nullptr){
+                return false;
+            }
+            int contador = 0;
+            for(Nodo* n: this->siguientes) {
+                if (n != nullptr) {
+                    contador++;
+                }
+            }
+            return (contador > 1);
+        }
+        bool esNodoFinalEliminable() {
+            int contador = 0;
+            for(Nodo* n: this->siguientes) {
+                if (n != nullptr) {
+                    contador++;
+                }
+            }
+            return (contador == 0);
         }
     };
 
+
     Nodo* raiz;
     int _size;
+
+
 };
 
 #include "string_map.hpp"

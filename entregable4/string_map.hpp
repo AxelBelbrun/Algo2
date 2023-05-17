@@ -34,8 +34,8 @@ void string_map<T>:: insert(const pair<string, T>& c){
 
         }
     }
-        T def =  (c.second);
-        actual->definicion = &def;
+        T* def = new T (c.second) ;
+        actual->definicion = def;
         _size++;
 
 
@@ -45,13 +45,22 @@ void string_map<T>:: insert(const pair<string, T>& c){
 
 template <typename T>
 int string_map<T>::count(const string& clave) const{
+    if (raiz == nullptr){
+        return 0;
+    }
     Nodo* actual = raiz;
     for(char elem: clave){
-        if (actual->siguientes[int(elem)] == nullptr) {
-            return 0;
+        if ((actual != nullptr)) {
+            if((actual->siguientes[int(elem)]) == nullptr){
+                return 0;
+            }
+            else{
+                actual = actual->siguientes[int(elem)];
+
+            }
         }
         else {
-            actual = actual->siguientes[int(elem)];
+            return 0;
         }
     }
     if (actual->definicion != nullptr){
@@ -68,7 +77,10 @@ const T& string_map<T>::at(const string& clave) const {
     for(char elem: clave){
         actual = actual->siguientes[int(elem)];
     }
-    return actual->definicion;
+    T* res = actual->definicion;
+    T res2 = *res;
+
+    return *(actual->definicion);
 }
 
 template <typename T>
@@ -78,13 +90,30 @@ T& string_map<T>::at(const string& clave) {
         actual = actual->siguientes[int(elem)];
     }
 
-
-   return *&actual->definicion ;
+   return *(actual->definicion);
 }
 
 template <typename T>
 void string_map<T>::erase(const string& clave) {
-    // COMPLETAR
+    Nodo* actual = raiz;
+    Nodo* anterior = raiz;
+    Nodo* ultimoNoBorrable = raiz;
+    for(char elem: clave){
+        if ((actual->esNodoEliminable()) && (actual != raiz)){
+            actual = actual->siguientes[int(elem)];
+
+        }
+        else {
+            actual = actual->siguientes[int(elem)];
+            anterior = actual;
+            ultimoNoBorrable = actual;
+        }
+    }
+    actual->definicion = nullptr;
+    if (actual->esNodoFinalEliminable()){
+        delete actual;
+    }
+    _size--;
 }
 
 template <typename T>
@@ -94,10 +123,10 @@ int string_map<T>::size() const{
 
 template <typename T>
 bool string_map<T>::empty() const{
-    if (size() == 0){
+    if (_size == 0){
         return true;
     }
-    else {
+
         return false;
-    }
+
 }
