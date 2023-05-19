@@ -83,25 +83,32 @@ private:
     struct Nodo {
         vector<Nodo*> siguientes;
         T* definicion;
-        Nodo() :  definicion(nullptr) {
-
+        Nodo() {
+        definicion = nullptr;
         vector<Nodo*> vect(256, nullptr);
         siguientes = vect;}
         bool esNodoEliminable() {
+            if(this == nullptr){
+                return true;
+            }
+            else{
             if(this->definicion != nullptr){
                 return false;
             }
             int contador = 0;
-            for(Nodo* n: this->siguientes) {
+            for(Nodo* n: siguientes) {
                 if (n != nullptr) {
                     contador++;
                 }
             }
-            return (contador > 1);
-        }
+            return (contador <= 1);
+        }}
         bool esNodoFinalEliminable() {
+            if(definicion != nullptr){
+                return false;
+            }
             int contador = 0;
-            for(Nodo* n: this->siguientes) {
+            for(Nodo* n: siguientes) {
                 if (n != nullptr) {
                     contador++;
                 }
@@ -113,7 +120,7 @@ private:
 
     Nodo* raiz;
     int _size;
-
+    set<string> claves;
 
 };
 

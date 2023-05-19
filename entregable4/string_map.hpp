@@ -1,5 +1,6 @@
 template <typename T>
-string_map<T>::string_map() : _size(0), raiz(nullptr){
+string_map<T>::string_map() : _size(0), claves({}){
+    raiz = new Nodo();
 
 }
 
@@ -8,37 +9,55 @@ string_map<T>::string_map(const string_map<T>& aCopiar) : string_map() { *this =
 
 template <typename T>
 string_map<T>& string_map<T>::operator=(const string_map<T>& d) {
-    this-> = string_map<T>(d);
-    return this;
+    for(string s: this->claves){
+        erase(s);
+    }
+
+    for(string t: d.claves){
+        pair<string, T> c = make_pair(t,d.at(t));
+        this->insert(c);
+
+    }
+    return *this;
 }
 
 template <typename T>
 string_map<T>::~string_map(){
-    // COMPLETAR
+
+    delete raiz;
 }
 
 template <typename T>
 void string_map<T>:: insert(const pair<string, T>& c){
-
-    if (raiz == nullptr){
-        raiz = new Nodo();
-    }
-        Nodo* actual = raiz;
-    for(char elem: (c.first)) {
-    if (actual->siguientes[int(elem)] == nullptr) {
-            actual->siguientes[int(elem)] = new Nodo();
-            actual = actual ->siguientes[int(elem)];
-
-        } else {
-            actual = actual->siguientes[int(elem)];
-
-
+    Nodo* actual = raiz;
+    Nodo* padre;
+    int i = 0;
+    string clave = c.first;
+    T* def = new T (c.second);
+    while((i < clave.size())){
+        if (raiz == nullptr){
+            raiz = new Nodo();
+            actual = actual->siguientes[int(clave[i])];
+            i++;
         }
+        else if (actual == nullptr){
+           padre->siguientes[int(clave[i-1])] = new Nodo();
+           actual = padre->siguientes[int(clave[i-1])];
+       }
+        else{
+        padre = actual;
+        actual = actual->siguientes[int(clave[i])];
+        i++;}
     }
-        T* def = new T (c.second) ;
-        actual->definicion = def;
+        if(actual == nullptr){
+            padre->siguientes[int(clave[i-1])] = new Nodo();
+            padre->siguientes[int(clave[i-1])]->definicion = def;
+        }
+        else {
+            actual->definicion = def;
+        }
+        claves.insert(clave);
         _size++;
-
 
     }
 
@@ -46,30 +65,7 @@ void string_map<T>:: insert(const pair<string, T>& c){
 
 template <typename T>
 int string_map<T>::count(const string& clave) const{
-    if (raiz == nullptr){
-        return 0;
-    }
-    Nodo* actual = raiz;
-    for(char elem: clave){
-        if ((actual != nullptr)) {
-            if((actual->siguientes[int(elem)]) == nullptr){
-                return 0;
-            }
-            else{
-                actual = actual->siguientes[int(elem)];
-
-            }
-        }
-        else {
-            return 0;
-        }
-    }
-    if (actual->definicion != nullptr){
-        return 1;
-    }
-    else {
-        return 0;
-    }
+  return claves.count((clave));
 }
 
 template <typename T>
@@ -78,9 +74,6 @@ const T& string_map<T>::at(const string& clave) const {
     for(char elem: clave){
         actual = actual->siguientes[int(elem)];
     }
-    T* res = actual->definicion;
-    T res2 = *res;
-
     return *(actual->definicion);
 }
 
@@ -97,40 +90,24 @@ T& string_map<T>::at(const string& clave) {
 template <typename T>
 void string_map<T>::erase(const string& clave) {
     Nodo* actual = raiz;
-    Nodo* anterior = raiz;
-    Nodo* ultimoNoBorrable = raiz;
+    Nodo* padre = raiz;
     int indice = 0;
-    for(char elem: clave){
-        if ((actual->esNodoEliminable()) && (actual != raiz)){
-            actual = actual->siguientes[int(elem)];
-
-        }
-        else {
-            actual = actual->siguientes[int(elem)];
-            anterior = actual;
-            ultimoNoBorrable = actual;
+    int i = clave.size();
+    while((i >= 0) and ((actual->esNodoFinalEliminable()))){
+        padre = raiz;
+        actual = raiz;
+        indice = 0;
+    while ((indice<i)) {
+            padre = actual;
+            actual = actual->siguientes[int(clave[indice])];
             indice++;
-
-        }
     }
-    actual->definicion = nullptr;
     if (actual->esNodoFinalEliminable()){
-        delete actual;
+        delete padre->siguientes[int(clave[i-1])];
     }
-    int i = 0;
-    actual = raiz;
-    for(char elem: clave){
-        if(i<=indice){
-            actual = actual->siguientes[int(elem)];
-
-        }
-        else{
-        Nodo* temp = actual->siguientes[int(elem)];
-        delete actual;
-        actual = temp;
-        }
-    }
-
+    actual = padre;
+    i--;}
+    claves.erase(clave);
     _size--;
 }
 
