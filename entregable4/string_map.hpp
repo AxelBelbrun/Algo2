@@ -9,7 +9,8 @@ string_map<T>::string_map(const string_map<T>& aCopiar) : string_map() { *this =
 
 template <typename T>
 string_map<T>& string_map<T>::operator=(const string_map<T>& d) {
-
+    /* Inserto en el diccionario nuevo cada una de las claves
+     * del dicionario a copiar */
     for(string t: d.claves){
         pair<string, T> c = make_pair(t,d.at(t));
         this->insert(c);
@@ -20,11 +21,12 @@ string_map<T>& string_map<T>::operator=(const string_map<T>& d) {
 
 template <typename T>
 string_map<T>::~string_map(){
+    /* Copio en una variable local el conjunto de claves
+     * de la instancia, para poder iterar con un for */
     set<string> res = this->claves;
-    if (!(claves.empty())) {
-        for (string s: res) {
-            this->erase((s));
-        }
+    /* Borro cada una de esas claves */
+    for (string s: res) {
+        this->erase((s));
     }
     delete raiz;
 
@@ -38,39 +40,85 @@ void string_map<T>:: insert(const pair<string, T>& c){
     string clave = c.first;
     T* def = new T (c.second);
     while((i < clave.size())){
+        /* Si la raíz es nula (por defecto en el constructor es null), creo un nuevo nodo y apunto la raíz ahí. */
         if (raiz == nullptr){
             raiz = new Nodo();
             padre = raiz;
+            /* Me muevo al nodo siguiente que representa a mi letra actual */
             actual = raiz->siguientes[int(clave[i])];
             i++;
         }
+        /* En caso de que esté parado en un nodo nulo, vuelvo al padre, y en el nodo hijo que
+         * representaría a mi actual, creo un nuevo nodo */
         else if (actual == nullptr){
            padre->siguientes[int(clave[i-1])] = new Nodo();
            actual = padre->siguientes[int(clave[i-1])];
        }
         else{
-        padre = actual;
-        actual = actual->siguientes[int(clave[i])];
-        i++;}
+            padre = actual;
+            actual = actual->siguientes[int(clave[i])];
+            i++;
+        }
     }
-    if(actual == nullptr){
-        padre->siguientes[int(clave[i-1])] = new Nodo();
-        padre->siguientes[int(clave[i-1])]->definicion = def;
+    /* Ya llegué al nodo que representa a mi palabra. Si es null, vuelvo al padre,
+     * creo un nodo nuevo en el hijo que representa la última letra y luego le asigno el
+     * significado */
+    if(actual == nullptr) {
+        padre->siguientes[int(clave[i - 1])] = new Nodo();
+        padre->siguientes[int(clave[i - 1])]->definicion = def;
         delete actual;
-        }
-    else {
-        actual->definicion = def;
-        }
-    claves.insert(clave);
-    _size++;
-
+        _size++;
     }
+    /* Si era un nodo no null, simplemente actualizo la definición */
+    else {
+        /* Si no había nada definido es porque estoy ingresando una nueva
+         * clave */
+        if (actual->definicion == nullptr){
+            delete actual->definicion;
+            actual->definicion = def;
+            _size++;
+        }
+        /* Si no, simplemente estoy modificandp el significado de una clave ya existente */
+        else{
+            delete actual->definicion;
+            actual->definicion = def;
+        }
+    }
+    /* Me guardo la nueva clave en mi conjunto de claves */
+    claves.insert(clave);
+}
 
 
 
 template <typename T>
 int string_map<T>::count(const string& clave) const{
-  return claves.count((clave));
+  Nodo* actual = raiz;
+  /* Recorro el trie */
+  for(char c : clave){
+      /* Si el nodo es nulo es porque en algún momento el camino deja de existir,
+       * entonces esa clave no pertenece al dicionario */
+      if (actual == nullptr){
+          return 0;
+      }
+      else {
+          actual = actual->siguientes[int(c)];
+      }
+  }
+  /*Si salió del for es porque llegó al final del camino.
+   * Hay varios casos: */
+  /* Si el nodo final es nulo, es porque no existe esa clave: */
+  if(actual == nullptr){
+      return 0;
+  }
+  /* Si el nodo existe pero no tiene definición, la clave tampoco
+   * existe */
+  else if ((actual->definicion) == nullptr){
+      return 0;
+  }
+  /* De otro modo, la clave existe: */
+  else {
+      return 1;
+  }
 }
 
 template <typename T>
@@ -119,15 +167,21 @@ void string_map<T>::erase(const string& clave) {
                 i++;
             }
             else {
-                if (i == indice+1){
-                    padre->siguientes[int(clave[i])] = nullptr;
-                }
-                Nodo* temp = actual->siguientes[int(c)];
-                delete actual->definicion;
-                delete actual;
+                if (i == indice + 1) {
+                    Nodo *temp = actual->siguientes[int(c)];
+                    delete actual->definicion;
+                    delete actual;
+                    actual = temp;
+                    i++;
+                    padre->siguientes[int(clave[i - 1])] = nullptr;
+                } else {
+                    Nodo *temp = actual->siguientes[int(c)];
+                    delete actual->definicion;
+                    delete actual;
 
-                actual = temp;
-                i++;
+                    actual = temp;
+                    i++;
+                }
             }
         }
         delete actual->definicion;
