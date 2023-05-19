@@ -85,12 +85,9 @@ private:
         T* definicion;
         Nodo() {
         vector<Nodo*> vect(256, nullptr);
-        siguientes = vect;}
+        siguientes = vect;
+        definicion = nullptr;}
         bool esNodoEliminable() {
-            if(this == nullptr){
-                return true;
-            }
-            else{
             if(definicion != nullptr){
                 return false;
             }
@@ -101,7 +98,7 @@ private:
                 }
             }
             return (contador <= 1);
-        }}
+        }
         bool esNodoFinalEliminable() {
 
             int contador = 0;

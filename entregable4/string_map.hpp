@@ -30,6 +30,7 @@ string_map<T>::~string_map(){
     }
     delete raiz;
 
+
 }
 
 template <typename T>
@@ -51,7 +52,9 @@ void string_map<T>:: insert(const pair<string, T>& c){
         /* En caso de que esté parado en un nodo nulo, vuelvo al padre, y en el nodo hijo que
          * representaría a mi actual, creo un nuevo nodo */
         else if (actual == nullptr){
+
            padre->siguientes[int(clave[i-1])] = new Nodo();
+
            actual = padre->siguientes[int(clave[i-1])];
        }
         else{
@@ -64,9 +67,9 @@ void string_map<T>:: insert(const pair<string, T>& c){
      * creo un nodo nuevo en el hijo que representa la última letra y luego le asigno el
      * significado */
     if(actual == nullptr) {
+
         padre->siguientes[int(clave[i - 1])] = new Nodo();
         padre->siguientes[int(clave[i - 1])]->definicion = def;
-        delete actual;
         _size++;
     }
     /* Si era un nodo no null, simplemente actualizo la definición */
@@ -96,7 +99,7 @@ int string_map<T>::count(const string& clave) const{
   /* Recorro el trie */
   for(char c : clave){
       /* Si el nodo es nulo es porque en algún momento el camino deja de existir,
-       * entonces esa clave no pertenece al dicionario */
+       * entonces esa clave no pertenece al diccionario */
       if (actual == nullptr){
           return 0;
       }
@@ -124,6 +127,7 @@ int string_map<T>::count(const string& clave) const{
 template <typename T>
 const T& string_map<T>::at(const string& clave) const {
     Nodo* actual = raiz;
+    /* Recorro el trie y devuelvo el significado */
     for(char elem: clave){
         actual = actual->siguientes[int(elem)];
     }
@@ -144,19 +148,30 @@ template <typename T>
 void string_map<T>::erase(const string& clave) {
     Nodo* actual = raiz;
     Nodo* padre;
-    int indice = -1;
+    int indice;
 
-    for(char c: clave){
+    /*Recorro una vez el árbol para identificar el nodo que representa la palabra y también
+     * para saber cuál es el último nodo no eliminable */
+    int j = 0;
+    while (j< clave.size()){
+        /*Si no es eliminable, es candidato a ser el último nodo
+         * no eliminable */
         if(!(actual->esNodoEliminable())){
-            indice ++;
+            indice = j;
+
             padre = actual;
-            actual = actual->siguientes[int(c)];
+            actual = actual->siguientes[int(clave[j])];
+            j++;
+
         }
         else {
             padre = actual;
-            actual = actual->siguientes[int(c)];
+            actual = actual->siguientes[int(clave[j])];
+
+            j++;
         }
     }
+
     int i = 0;
     if (actual->esNodoFinalEliminable()){
         actual = raiz;
