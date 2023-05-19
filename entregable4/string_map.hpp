@@ -9,10 +9,16 @@ string_map<T>::string_map(const string_map<T>& aCopiar) : string_map() { *this =
 
 template <typename T>
 string_map<T>& string_map<T>::operator=(const string_map<T>& d) {
-    for(string s: this->claves){
-        erase(s);
-    }
 
+    set<string> res = this->claves;
+    if (!(claves.empty())) {
+        for (string s: res) {
+            erase((s));
+        }
+    }
+    delete raiz;
+    _size = 0;
+    raiz = new Nodo();
     for(string t: d.claves){
         pair<string, T> c = make_pair(t,d.at(t));
         this->insert(c);
@@ -23,7 +29,13 @@ string_map<T>& string_map<T>::operator=(const string_map<T>& d) {
 
 template <typename T>
 string_map<T>::~string_map(){
-
+    set<string> res = this->claves;
+    if (!(claves.empty())) {
+        for (string s: res) {
+            this->erase((s));
+        }
+    }
+    delete raiz->definicion;
     delete raiz;
 }
 
@@ -37,7 +49,7 @@ void string_map<T>:: insert(const pair<string, T>& c){
     while((i < clave.size())){
         if (raiz == nullptr){
             raiz = new Nodo();
-            actual = actual->siguientes[int(clave[i])];
+            actual = raiz->siguientes[int(clave[i])];
             i++;
         }
         else if (actual == nullptr){
@@ -49,15 +61,15 @@ void string_map<T>:: insert(const pair<string, T>& c){
         actual = actual->siguientes[int(clave[i])];
         i++;}
     }
-        if(actual == nullptr){
-            padre->siguientes[int(clave[i-1])] = new Nodo();
-            padre->siguientes[int(clave[i-1])]->definicion = def;
+    if(actual == nullptr){
+        padre->siguientes[int(clave[i-1])] = new Nodo();
+        padre->siguientes[int(clave[i-1])]->definicion = def;
         }
-        else {
-            actual->definicion = def;
+    else {
+        actual->definicion = def;
         }
-        claves.insert(clave);
-        _size++;
+    claves.insert(clave);
+    _size++;
 
     }
 
@@ -90,23 +102,50 @@ T& string_map<T>::at(const string& clave) {
 template <typename T>
 void string_map<T>::erase(const string& clave) {
     Nodo* actual = raiz;
-    Nodo* padre = raiz;
-    int indice = 0;
-    int i = clave.size();
-    while((i >= 0) and ((actual->esNodoFinalEliminable()))){
-        padre = raiz;
-        actual = raiz;
-        indice = 0;
-    while ((indice<i)) {
+    Nodo* padre;
+    int indice = -1;
+
+    for(char c: clave){
+        if(!(actual->esNodoEliminable())){
+            indice ++;
             padre = actual;
-            actual = actual->siguientes[int(clave[indice])];
-            indice++;
+            actual = actual->siguientes[int(c)];
+        }
+        else {
+            padre = actual;
+            actual = actual->siguientes[int(c)];
+        }
     }
+    int i = 0;
     if (actual->esNodoFinalEliminable()){
-        delete padre->siguientes[int(clave[i-1])];
+        actual = raiz;
+        for(char c: clave){
+            if (i<= indice){
+                padre = actual;
+                actual = actual->siguientes[int(c)];
+                i++;
+            }
+            else {
+                if (i == indice+1){
+                    padre->siguientes[int(clave[i])] = nullptr;
+                }
+                Nodo* temp = actual->siguientes[int(c)];
+                delete actual->definicion;
+                delete actual;
+
+                actual = temp;
+                i++;
+            }
+        }
+        delete actual->definicion;
+        delete actual;
+
     }
-    actual = padre;
-    i--;}
+    else {
+        delete actual->definicion;
+        actual->definicion = nullptr;
+    }
+
     claves.erase(clave);
     _size--;
 }
