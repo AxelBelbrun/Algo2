@@ -1,6 +1,6 @@
 template <typename T>
 string_map<T>::string_map() : _size(0), claves({}){
-    raiz = new Nodo();
+    raiz = nullptr;
 
 }
 
@@ -10,15 +10,6 @@ string_map<T>::string_map(const string_map<T>& aCopiar) : string_map() { *this =
 template <typename T>
 string_map<T>& string_map<T>::operator=(const string_map<T>& d) {
 
-    set<string> res = this->claves;
-    if (!(claves.empty())) {
-        for (string s: res) {
-            erase((s));
-        }
-    }
-    delete raiz;
-    _size = 0;
-    raiz = new Nodo();
     for(string t: d.claves){
         pair<string, T> c = make_pair(t,d.at(t));
         this->insert(c);
@@ -35,8 +26,8 @@ string_map<T>::~string_map(){
             this->erase((s));
         }
     }
-    delete raiz->definicion;
     delete raiz;
+
 }
 
 template <typename T>
@@ -49,6 +40,7 @@ void string_map<T>:: insert(const pair<string, T>& c){
     while((i < clave.size())){
         if (raiz == nullptr){
             raiz = new Nodo();
+            padre = raiz;
             actual = raiz->siguientes[int(clave[i])];
             i++;
         }
@@ -64,6 +56,7 @@ void string_map<T>:: insert(const pair<string, T>& c){
     if(actual == nullptr){
         padre->siguientes[int(clave[i-1])] = new Nodo();
         padre->siguientes[int(clave[i-1])]->definicion = def;
+        delete actual;
         }
     else {
         actual->definicion = def;

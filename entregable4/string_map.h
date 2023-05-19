@@ -84,7 +84,6 @@ private:
         vector<Nodo*> siguientes;
         T* definicion;
         Nodo() {
-        definicion = nullptr;
         vector<Nodo*> vect(256, nullptr);
         siguientes = vect;}
         bool esNodoEliminable() {
@@ -92,24 +91,22 @@ private:
                 return true;
             }
             else{
-            if(this->definicion != nullptr){
+            if(definicion != nullptr){
                 return false;
             }
             int contador = 0;
-            for(Nodo* n: siguientes) {
-                if (n != nullptr) {
+            for(Nodo* n: this->siguientes) {
+                if (&n != nullptr) {
                     contador++;
                 }
             }
             return (contador <= 1);
         }}
         bool esNodoFinalEliminable() {
-            if(definicion != nullptr){
-                return false;
-            }
+
             int contador = 0;
             for(Nodo* n: siguientes) {
-                if (n != nullptr) {
+                if (&n != nullptr) {
                     contador++;
                 }
             }
