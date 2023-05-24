@@ -21,16 +21,11 @@ string_map<T>& string_map<T>::operator=(const string_map<T>& d) {
 
 template <typename T>
 string_map<T>::~string_map(){
-    /* Copio en una variable local el conjunto de claves
-     * de la instancia, para poder iterar con un for */
-    set<string> res = this->claves;
-    /* Borro cada una de esas claves */
-    for (string s: res) {
-        this->erase((s));
-    }
-    delete raiz;
-
-
+set<string> res = this->claves;
+for(string s: res){
+    this->erase(s);
+}
+delete raiz;
 }
 
 template <typename T>
@@ -148,7 +143,7 @@ template <typename T>
 void string_map<T>::erase(const string& clave) {
     Nodo* actual = raiz;
     Nodo* padre;
-    int indice;
+    int indice = -1;
 
     /*Recorro una vez el árbol para identificar el nodo que representa la palabra y también
      * para saber cuál es el último nodo no eliminable */
@@ -156,7 +151,7 @@ void string_map<T>::erase(const string& clave) {
     while (j< clave.size()){
         /*Si no es eliminable, es candidato a ser el último nodo
          * no eliminable */
-        if(!(actual->esNodoEliminable())){
+        if(!(actual->esNodoEliminable(*actual))){
             indice = j;
 
             padre = actual;
@@ -173,29 +168,40 @@ void string_map<T>::erase(const string& clave) {
     }
 
     int i = 0;
-    if (actual->esNodoFinalEliminable()){
+    if (actual->esNodoFinalEliminable(*actual)){
         actual = raiz;
-        for(char c: clave){
-            if (i<= indice){
-                padre = actual;
-                actual = actual->siguientes[int(c)];
-                i++;
+        if (indice == -1){
+            for(char c: clave){
+                Nodo* temp = actual->siguientes[int(c)];
+                delete actual->definicion;
+                delete actual;
+                actual = temp;
             }
-            else {
-                if (i == indice + 1) {
-                    Nodo *temp = actual->siguientes[int(c)];
-                    delete actual->definicion;
-                    delete actual;
-                    actual = temp;
+            raiz = new Nodo();
+        }
+        else {
+            for (char c: clave) {
+                if (i <= indice) {
+                    padre = actual;
+                    actual = actual->siguientes[int(c)];
                     i++;
-                    padre->siguientes[int(clave[i - 1])] = nullptr;
                 } else {
-                    Nodo *temp = actual->siguientes[int(c)];
-                    delete actual->definicion;
-                    delete actual;
+                    if (i == indice + 1) {
+                        Nodo *temp = actual->siguientes[int(c)];
+                        delete actual->definicion;
+                        delete actual;
+                        actual = temp;
+                        padre->siguientes[int(clave[i-1])] = nullptr;
+                        i++;
 
-                    actual = temp;
-                    i++;
+                    } else {
+                        Nodo *temp = actual->siguientes[int(c)];
+                        delete actual->definicion;
+                        delete actual;
+
+                        actual = temp;
+                        i++;
+                    }
                 }
             }
         }

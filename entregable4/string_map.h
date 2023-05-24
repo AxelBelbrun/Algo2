@@ -31,7 +31,7 @@ public:
     ~string_map();
 
     /**
-    INSERT 
+    INSERT
     * Inserta un par clave, valor en el diccionario
     **/
     void insert(const pair<string, T>&);
@@ -84,26 +84,26 @@ private:
         vector<Nodo*> siguientes;
         T* definicion;
         Nodo() {
-        vector<Nodo*> vect(256, nullptr);
-        siguientes = vect;
-        definicion = nullptr;}
-        bool esNodoEliminable() {
-            if(definicion != nullptr){
+            vector<Nodo*> vect(256, nullptr);
+            siguientes = vect;
+            definicion = nullptr;}
+        bool esNodoEliminable(Nodo c) {
+            if(c.definicion != nullptr){
                 return false;
             }
             int contador = 0;
-            for(Nodo* n: this->siguientes) {
-                if (&n != nullptr) {
+            for(Nodo* n: c.siguientes) {
+                if (n != nullptr) {
                     contador++;
                 }
             }
             return (contador <= 1);
         }
-        bool esNodoFinalEliminable() {
+        bool esNodoFinalEliminable(Nodo c) {
 
             int contador = 0;
-            for(Nodo* n: siguientes) {
-                if (&n != nullptr) {
+            for(Nodo* n: c.siguientes) {
+                if (n != nullptr) {
                     contador++;
                 }
             }
